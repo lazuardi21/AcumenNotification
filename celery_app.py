@@ -2,6 +2,13 @@
 Notification Service — Celery application configuration.
 """
 import os
+import sys
+
+# Ensure /app is on the Python path for forked worker processes
+app_dir = os.path.dirname(os.path.abspath(__file__))
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+
 from celery import Celery
 
 # Create Celery app with task auto-discovery
