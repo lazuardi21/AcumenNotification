@@ -3,13 +3,13 @@ Notification Service — Celery application configuration.
 """
 import os
 from celery import Celery
-from celery.schedules import crontab
 
-# Create Celery app
+# Create Celery app with task auto-discovery
 celery = Celery(
     'notification_service',
     broker=os.environ.get('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//'),
     backend=os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/1'),
+    include=['tasks'],
 )
 
 # Celery configuration
@@ -23,13 +23,6 @@ celery.conf.update(
     # Retry configuration
     task_acks_late=True,
     worker_prefetch_multiplier=1,
-
-    # Task routing
-    task_routes={
-        'tasks.process_event': {'queue': 'events'},
-        'tasks.send_notification_task': {'queue': 'notifications'},
-        'tasks.retry_failed_task': {'queue': 'maintenance'},
-    },
 
     # Periodic tasks (Celery Beat)
     beat_schedule={
